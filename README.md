@@ -2,9 +2,9 @@
 
 Dashboard interativo em **Streamlit** para análise de voltas e comparação de pilotos usando dados da **FastF1**.
 
-## Demo (opcional)
+## Demo (a fazer)
 
-- Adicione aqui prints/GIF do app (ex.: `assets/demo.gif`) para deixar o repositório mais forte no LinkedIn.
+- Adicione aqui prints/GIF do app (ex.: `assets/demo.gif`) para deixar o repositório mais ilustrativo.
 
 ## Funcionalidades
 
