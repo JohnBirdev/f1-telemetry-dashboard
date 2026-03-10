@@ -97,25 +97,32 @@ def plot_animated_circuit(x, y, sectors, driver):
 
     return fig
 
-def plot_all_race_laps_overview(laps):
+def plot_all_race_laps_overview(laps, selected_driver=None):
 
     fastest_lap = laps['LapTimeSeconds'].min()
 
     fig = go.Figure()
 
     for driver in laps['Driver'].unique():
+
         driver_data = laps[laps['Driver'] == driver]
+
+        opacity = 0.3
+        width = 1
+
+        if driver == selected_driver:
+            opacity = 1
+            width = 3
 
         fig.add_trace(go.Scatter(
             x=driver_data['LapNumber'],
             y=driver_data['LapTimeSeconds'],
             mode='lines',
-            line=dict(width=1),
-            opacity=0.3,
-            showlegend=False
+            line=dict(width=width),
+            opacity=opacity,
+            name=driver
         ))
 
-    # Destacar volta mais rápida
     fastest = laps[laps['LapTimeSeconds'] == fastest_lap]
 
     fig.add_trace(go.Scatter(
@@ -123,13 +130,13 @@ def plot_all_race_laps_overview(laps):
         y=fastest['LapTimeSeconds'],
         mode='markers',
         marker=dict(color='purple', size=12),
-        name="Volta mais rápida"
+        name="Fastest Lap"
     ))
 
     fig.update_layout(
         template="plotly_dark",
-        xaxis_title="Volta",
-        yaxis_title="Tempo (s)"
+        xaxis_title="Lap",
+        yaxis_title="Lap Time (s)"
     )
 
     return fig
@@ -140,7 +147,7 @@ def render_driver_table(laps, driver):
 
     driver_laps['LapNumber'] = driver_laps['LapNumber'].astype(int)
 
-    #Fastest da corrida
+    #Mais rápido da corrida
     fastest_overall = laps['LapTimeSeconds'].min()
 
     #Melhor volta pessoal do piloto
@@ -160,7 +167,7 @@ def render_driver_table(laps, driver):
         atol=tolerance
     )
 
-    # Formatação tempo
+    #Formatação de tempo
     driver_laps['LapTimeFormatted'] = driver_laps['LapTimeSeconds'].apply(
         lambda x: f"{int(x//60)}:{x%60:06.3f}"
     )
@@ -175,7 +182,7 @@ def render_driver_table(laps, driver):
 
     driver_laps["Tyre"] = driver_laps["Compound"].map(tyre_map)
 
-    # Badge textual
+    #Badge textual
     driver_laps.loc[
         driver_laps["IsFastestOverall"],
         "LapTimeFormatted"
@@ -191,7 +198,7 @@ def render_driver_table(laps, driver):
         ["LapNumber", "LapTimeFormatted", "Tyre"]
     ]
 
-    # 🎨 Estilização
+    #Estilização
     def highlight(row):
         idx = row.name
 
@@ -216,39 +223,32 @@ def plot_animated_circuit_comparison(
     x2, y2, t2, sectors2, driver2,
     steps=500,
 ):
-    # cores
+    #cores
     driver1_color = DRIVER_COLORS.get(driver1, "red")
     driver2_color = DRIVER_COLORS.get(driver2, "blue")
 
-    # cores dos setores
+    #cores dos setores
     sector_colors = {1: "purple", 2: "green", 3: "yellow"}
 
-    # ===============================
-    # 1️⃣ Definir eixo temporal global
-    # ===============================
+    
     t_start = min(t1[0], t2[0])
     t_end = max(t1[-1], t2[-1])
     t_new = np.linspace(t_start, t_end, steps)
 
-    # ===============================
-    # 2️⃣ Interpolação com base no tempo
-    # ===============================
+
+    #Interpolação com base no tempo
     x1_interp = np.interp(t_new, t1, x1)
     y1_interp = np.interp(t_new, t1, y1)
     x2_interp = np.interp(t_new, t2, x2)
     y2_interp = np.interp(t_new, t2, y2)
 
-    # ===============================
-    # 3️⃣ Forçar ponto inicial comum
-    # ===============================
+    #ponto inicial comum entre os dois pilotos
     x0 = (x1_interp[0] + x2_interp[0]) / 2
     y0 = (y1_interp[0] + y2_interp[0]) / 2
     x1_interp[0], y1_interp[0] = x0, y0
     x2_interp[0], y2_interp[0] = x0, y0
 
-    # ===============================
-    # 4️⃣ Traçados por setor - piloto 1
-    # ===============================
+    #Traçados por setor - piloto 1
     traces = []
     for sector in [1,2,3]:
         mask = sectors1 == sector
@@ -271,9 +271,7 @@ def plot_animated_circuit_comparison(
             showlegend=False
         ))
 
-    # ===============================
-    # 5️⃣ Marcadores iniciais
-    # ===============================
+    #Marcadores iniciais
     marker1 = go.Scatter(
         x=[x0], y=[y0],
         mode="markers+text",
@@ -291,9 +289,7 @@ def plot_animated_circuit_comparison(
         showlegend=False
     )
 
-    # ===============================
-    # 6️⃣ Frames da animação
-    # ===============================
+    #Frames da animação
     frames = []
     for k in range(steps):
         frames.append(go.Frame(data=[
@@ -307,14 +303,13 @@ def plot_animated_circuit_comparison(
         traces=[len(traces), len(traces)+1]  # apenas os dois marcadores
         ))
 
-    # ===============================
-    # 7️⃣ Layout final
-    # ===============================
+
+    #Layout final
     fig = go.Figure(
         data=traces + [marker1, marker2],
         frames=frames,
         layout=go.Layout(
-            title="Lap Comparison - Time Based",
+            title="Comparação de volta mais rápida de cada piloto",
             height=600,
             xaxis=dict(visible=False, scaleanchor="y", scaleratio=1),
             yaxis=dict(visible=False),

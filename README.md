@@ -2,9 +2,14 @@
 
 Dashboard interativo em **Streamlit** para análise de voltas e comparação de pilotos usando dados da **FastF1**.
 
-## Demo (a fazer)
+## Demo
 
-- Adicione aqui prints/GIF do app (ex.: `assets/demo.gif`) para deixar o repositório mais ilustrativo.
+![Dashboard Screenshot](assets/overview.png)
+![Dashboard Screenshot](assets/fastest_lap.png)
+![Dashboard Screenshot](assets/personal_best_lap_graphic.png)
+![Dashboard Screenshot](assets/driver_comparison.png)
+![Dashboard Screenshot](assets/drivers_comparison_graphic.png)
+![Dashboard Screenshot](assets/best_personal_lap.png)
 
 ## Funcionalidades
 
@@ -13,12 +18,6 @@ Dashboard interativo em **Streamlit** para análise de voltas e comparação de 
 - **Simulação animada** do traçado da melhor volta.
 - **Comparação de pilotos**: animação lado a lado com interpolação temporal.
 - **Controle de performance**: slider para ajustar a qualidade/peso das animações.
-
-## Por que esse projeto é bom para portfólio
-
-- **Produto completo**: UI + dados reais + visualizações + métricas.
-- **Engenharia**: cache do FastF1 e otimizações para evitar recarregamentos caros.
-- **Storytelling**: compara pilotos e mostra “o porquê” do tempo (trajeto/ritmo).
 
 ## Stack
 
@@ -68,10 +67,12 @@ Na primeira execução, o FastF1 pode demorar um pouco mais por causa de cache/d
 - `src/processing.py`: preparação de dados de voltas e extração de telemetria da volta mais rápida.
 - `src/simulation.py`: interpolação da telemetria para animação (base temporal).
 - `src/plots.py`: gráficos e animações com Plotly + tabela estilizada.
+- `src/ui_components.py`: Responsável por componentes visuais reutilizáveis do dashboard.
+
 
 ## Dados
 
 - Fonte: FastF1 (API/biblioteca).
-- Observação: o projeto cria/usa uma pasta `cache/` para armazenar dados do FastF1.
+
 
 

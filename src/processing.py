@@ -1,27 +1,42 @@
+from fastf1.core import DataNotLoadedError
+
+
 def prepare_lap_data(session):
 
-    available_cols = session.laps.columns
+    try:
+        laps = session.laps
+    except DataNotLoadedError:
+        return None
 
-    base_columns = ['Driver', 'LapNumber', 'LapTime', 'Compound']
+    if laps is None or laps.empty:
+        return None
 
-    # Só adiciona Stint se existir
-    if 'Stint' in available_cols:
-        base_columns.append('Stint')
+    available_cols = laps.columns
 
-    laps = session.laps[base_columns].dropna(subset=['LapTime']).copy()
+    base_columns = ["Driver", "LapNumber", "LapTime", "Compound"]
 
-    laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
+    if "Stint" in available_cols:
+        base_columns.append("Stint")
 
-    fastest_race_lap = laps['LapTimeSeconds'].min()
-    laps['IsFastestOverall'] = laps['LapTimeSeconds'] == fastest_race_lap
+    laps = laps[base_columns].dropna(subset=["LapTime"]).copy()
+
+    laps["LapTimeSeconds"] = laps["LapTime"].dt.total_seconds()
+
+    fastest_race_lap = laps["LapTimeSeconds"].min()
+
+    laps["IsFastestOverall"] = laps["LapTimeSeconds"] == fastest_race_lap
 
     return laps
 
+
 def get_fastest_lap_telemetry(session, driver, *, minimal: bool = True):
+
     driver_laps = session.laps.pick_drivers(driver)
+
     fastest_lap = driver_laps.pick_fastest()
 
     telemetry = fastest_lap.get_telemetry()
+
     if minimal:
         telemetry = telemetry[["Time", "X", "Y"]].copy()
 
@@ -29,8 +44,10 @@ def get_fastest_lap_telemetry(session, driver, *, minimal: bool = True):
 
 
 def _td_to_seconds(td) -> float | None:
+
     if td is None:
         return None
+
     try:
         return float(td.total_seconds())
     except Exception:
@@ -38,13 +55,9 @@ def _td_to_seconds(td) -> float | None:
 
 
 def get_fastest_lap_summary(session, driver: str) -> dict:
-    """
-    Retorna informações da volta mais rápida do piloto:
-    - lap_time_s (float)
-    - s1_s, s2_s, s3_s (float | None)
-    - top_speed_kmh (float | None)
-    """
+
     driver_laps = session.laps.pick_drivers(driver)
+
     fastest_lap = driver_laps.pick_fastest()
 
     lap_time_s = _td_to_seconds(getattr(fastest_lap, "LapTime", None))
@@ -53,10 +66,13 @@ def get_fastest_lap_summary(session, driver: str) -> dict:
     s3_s = _td_to_seconds(getattr(fastest_lap, "Sector3Time", None))
 
     top_speed_kmh = None
+
     try:
         tel = fastest_lap.get_telemetry()
+
         if "Speed" in tel.columns:
             top_speed_kmh = float(tel["Speed"].max())
+
     except Exception:
         top_speed_kmh = None
 

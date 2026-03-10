@@ -1,7 +1,7 @@
 import streamlit as st
 
 def get_driver_metadata(session, driver_code: str):
-    # Simulação/Mock da obtenção de dados
+    # Simulação da obtenção de dados
     drv = session.get_driver(driver_code)
     full_name = getattr(drv, "FullName", driver_code) or driver_code
     team_name = getattr(drv, "TeamName", "")
@@ -12,7 +12,6 @@ def get_driver_metadata(session, driver_code: str):
 def render_driver_header(session, side_label: str, driver_code: str):
     full_name, team_name, team_color = get_driver_metadata(session, driver_code)
 
-    # Criamos uma versão com transparência da cor da equipe para o fundo (RGBA)
     # Isso evita o preto total e cria um "glow" da equipe no card
     card_html = f"""
     <div style="
