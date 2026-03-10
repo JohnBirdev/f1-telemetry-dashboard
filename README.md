@@ -74,13 +74,4 @@ Na primeira execução, o FastF1 pode demorar um pouco mais por causa de cache/d
 - Fonte: FastF1 (API/biblioteca).
 - Observação: o projeto cria/usa uma pasta `cache/` para armazenar dados do FastF1.
 
-## Deploy (ideia)
-
-- Você pode publicar no **Streamlit Community Cloud** apontando para `app.py`.
-- Garanta que `requirements.txt` esteja na raiz do projeto.
-
-## Notas e boas práticas
-
-- É recomendado **não versionar** a pasta `venv/`/`.venv/` no repositório (quando você usar Git).
-- A pasta `cache/` também deve ficar fora do versionamento (já existe `.gitignore`).
 
